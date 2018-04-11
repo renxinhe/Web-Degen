@@ -1,4 +1,4 @@
-# Weeb
+# Web Degen
 Webpage generation from images via deep learning.
 
 Initalization
