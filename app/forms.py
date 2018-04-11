@@ -10,10 +10,6 @@ class LoginForm(Form):
 	username = StringField("username", validators=[DataRequired()])
 	password = PasswordField("password", validators=[DataRequired()])
 
-class SignupForm(Form):
-	username = StringField("username", validators=[DataRequired()])
-	password = PasswordField("password", validators=[DataRequired()])
-
 class SaveForm(Form):
     name = StringField("name", validators=[DataRequired()])
 

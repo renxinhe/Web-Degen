@@ -2,46 +2,75 @@
 {% extends "base.html" %}
 
 {% block title %}
-	Upload
+Upload
 {% endblock %}
 
 <!-- 2. extend content here from base -->
+
+{% block user_status %}
+<a href="{{ url_for('logout') }}" class="btn btn-warning" role="button">Log Out</a>
+{% endblock %}
+
+
 {% block content %}
-<h1>Web Degen</h1>
-<div class="logout">
-  <a href="{{ url_for('logout') }}">Log Out</a>
+<div class="container">
+
+  <div class="jumbotron">
+    <div class="row">
+      <div class="col-md-6">
+        <h4>Upload an image:</h4>
+        <form class="form" action="" method="POST" enctype="multipart/form-data" name="upload">
+          {{ form.hidden_tag() }}
+          <div class="form-group">
+            {{ form.image(size=120) }}
+          </div>
+          <button type="submit" class="btn btn-primary">Upload Image</button>
+        </form>
+      </div>
+    </div>
+
+    <hr class="my-4">
+
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <h3> Your Saved HTMLs </h3>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 list-group">
+        {% for save in saves %}
+        <div class="list-group-item flex-column align-items-start">
+          <div class="row">
+            <div class="col-md-5">
+              <p class="align-middle">
+                {% if save['name'] %}
+                {{ save['name'] }}
+                {% else %}
+                Placeholder name
+                {% endif %}
+              </p>
+            </div>
+            <div class="col-md-4">
+              <p class="align-middle">
+                {% if save['date'] %}
+                {{ save['date'] }}
+                {% else %}
+                Placeholder date 12/1/2019
+                {% endif %}
+              </p>
+            </div>
+            <!-- TODO: change buttons into onclicks, maybe -->
+            <div class="col-md-3 d-flex flex-row-reverse">
+              <a href="{{ url_for('delete', value=save['id']) }}" class="btn btn-danger p-2" role="button">Delete</a>
+              <a href="{{ url_for('download', value=save['id']) }}" class="btn btn-outline-secondary p-2" role="button">Download</a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
 </div>
 
-<div class="main-container">
-  <form action="" method="POST" enctype="multipart/form-data" name="upload">
-    {{ form.hidden_tag() }}
-    <div class="section">
-      <p class="login-form-child">
-        <h3> Trip name: </h3> 
-        {{ form.image(size=120) }}
-      </p>
-    </div>
-    <p>
-    	<input type="submit" value="Upload Image">
-    </p>
-  </form>
-</div>
-
-<div class="main-container">
-  <h3> Your Saved HTMLs </h3>
-  {% for save in saves %}
-    <div class="saved-entry">
-      {% if save['name'] %} {{ save['name'] }} {% else %} Placeholder name {% endif %}
-      --
-      {% if save['date'] %} {{ save['date'] }} {% else %} Placeholder date 12/1/2019 {% endif %}
-      <!-- TODO: change buttons into onclicks, maybe -->
-      <button>
-        <a href="{{ url_for('download', value=save['id']) }}">Download</a>
-      </button>
-      <button>
-        <a href="{{ url_for('delete', value=save['id']) }}">Delete</a>
-      </button>
-    </div>
-  {% endfor %}
-</div>
 {% endblock %}

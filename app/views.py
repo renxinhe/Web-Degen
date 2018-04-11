@@ -15,37 +15,39 @@ def index():
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     form = LoginForm()
-    if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
-        users = retrieve_username()
-        user_id = check_up(username, password)
-        if user_id:
-            session['user_id'] = user_id
-            return redirect('/upload')
-    return render_template('login.html', form=form)
+    if request.method == 'POST':
+        action = request.form['action']
+        if action == 'login':
+            if form.validate_on_submit():
+                username = form.username.data
+                password = form.password.data
+                users = retrieve_username()
+                user_id = check_up(username, password)
+                if user_id:
+                    session['user_id'] = user_id
+                    return redirect('/upload')
+            return render_template('login.html', form=form)
+        elif action == 'signup':
+            if form.validate_on_submit():
+                username = form.username.data
+                password = form.password.data
+                users = check_user(username);
+                if not users:
+                    print 'Username "%s" taken.' % (username)
+                    return render_template('login.html', form=form, error='username-taken')
+                else:
+                    user_id = sign_up(username, password)
+                    session['user_id'] = user_id
+                    return redirect('/upload')
+            print 'Invalid data.'
+            return render_template('login.html', form=form, error='invalid-data')
+    elif request.method == 'GET':
+        return render_template('login.html', form=form)
 
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)
     return redirect('/login')
-
-# TODO: make login and signup one page with two buttons
-@app.route('/signup', methods=['POST', 'GET'])
-def signup():
-    form = SignupForm()
-    if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
-        users = check_user(username);
-        if not users:
-            return render_template('signup.html', form=form)
-        else:
-            user_id = sign_up(username, password)
-            session['user_id'] = user_id
-            return redirect('/upload')
-        
-    return render_template('signup.html', form=form)
 
 # https://flask-wtf.readthedocs.io/en/stable/form.html#module-flask_wtf.file
 @app.route('/upload', methods=['POST', 'GET'])
@@ -60,25 +62,23 @@ def upload():
             f.save(os.path.join(app.instance_path, 'photos', filename))
             session["filename"] = filename
             return redirect("/preview")
-
         saves = retrieve_saves(user_id)
         return render_template('upload.html', form=form, saves=saves)
     return redirect("/login")
 
 @app.route('/preview', methods=['POST', 'GET'])
 def preview():
-    # import pdb; pdb.set_trace()
     form = SaveForm()
-    filename = session["filename"]
     data = get_preview()
-
-    if form.validate_on_submit():
-        name = form.name.data
-        save_stuff(name, filename, data)
-        return redirect('/upload')
-    if request.method == 'POST' and request.form['submit'] == 'Discard':
-        return redirect('/upload')
-
+    if request.method == 'POST':
+        filename = session["filename"]
+        if request.form['action'] == 'save' and form.validate_on_submit():
+            name = form.name.data
+            save_stuff(name, filename, data)
+            return redirect('/upload')
+        if request.form['action'] == 'discard':
+            return redirect('/upload')
+        return 'Action should be either "save" or "discard".'
     return render_template('preview.html', form=form, preview=data)
 
 # TODO: get HTML preview or whatever is generated from image

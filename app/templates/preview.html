@@ -2,39 +2,34 @@
 {% extends "base.html" %}
 
 {% block title %}
-	Upload
+Upload
+{% endblock %}
+
+{% block user_status %}
+<a href="{{ url_for('logout') }}" class="btn btn-warning" role="button">Log Out</a>
 {% endblock %}
 
 <!-- 2. extend content here from base -->
 {% block content %}
-<h1>Web Degen</h1>
-<div class="logout">
-  <a href="{{ url_for('logout') }}">Log Out</a>
-</div>
-
-<div class="main-container">
-  <div class="preview">
+<div class="container">
+  <div class="jumbotron">
     {% if preview %}
-      <!-- do whatever it takes to show a preview of the gen -->
+    <!-- do whatever it takes to show a preview of the gen -->
     {% else %}
-      Placeholder preview
+    Placeholder webpage preview
     {% endif %}
   </div>
 
-  <form action="" method="POST" name="save">
+  <form class="form-inline" action="" method="POST" name="preview">
     {{ form.hidden_tag() }}
-    <div class="section">
-      <p class="login-form-child">
-        Name: {{ form.name(size=120) }}
-      </p>
+    <div class="form-group mb-2">
+      <label>Webpage name:</label>
     </div>
-    <p>
-    	<input type="submit" name="submit" value="Save">
-    </p>
-  </form>
-  <form action="" method="POST" name="discard">
-    {{ form.hidden_tag() }}
-      <input type="submit" name="submit" value="Discard">
+    <div class="form-group mx-sm-3 mb-2">
+      <input class="form-control" id="name" name="name" size="20" type="text" value="">
+    </div>
+    <button type="submit" class="btn btn-success" name="action" value="save">Save</button>
+    <button type="submit" class="btn btn-danger" name="action" value="discard">Discard</button>
   </form>
 </div>
 {% endblock %}
