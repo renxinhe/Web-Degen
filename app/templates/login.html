@@ -1,0 +1,31 @@
+<!-- 1. extend from base-->
+{% extends "base.html" %}
+
+{% block title %}
+	Login
+{% endblock %}
+
+<!-- 2. extend content here from base -->
+{% block content %}
+<h1>Web Degen</h1>
+
+<div class="main-container">
+	<h3>Please log in or <a href="{{ url_for('signup')}}">sign up</a>.</h3>
+    <form action="" method="post" name="login">
+      {{ form.hidden_tag() }}
+      <div class="section">
+        <p class="login-form-child">
+          Username:<br>
+          {{ form.username(size=120) }}<br>
+        </p>
+        <p class="login-form-child">
+          Password:<br>
+          {{ form.password(size=120) }}<br>
+        </p>
+      </div>
+      <p>
+      	<input type="submit" value="Log in">
+      </p>
+    </form>
+</div>
+{% endblock %}

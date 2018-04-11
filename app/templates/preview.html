@@ -1,0 +1,40 @@
+<!-- 1. extend from base-->
+{% extends "base.html" %}
+
+{% block title %}
+	Upload
+{% endblock %}
+
+<!-- 2. extend content here from base -->
+{% block content %}
+<h1>Web Degen</h1>
+<div class="logout">
+  <a href="{{ url_for('logout') }}">Log Out</a>
+</div>
+
+<div class="main-container">
+  <div class="preview">
+    {% if preview %}
+      <!-- do whatever it takes to show a preview of the gen -->
+    {% else %}
+      Placeholder preview
+    {% endif %}
+  </div>
+
+  <form action="" method="POST" name="save">
+    {{ form.hidden_tag() }}
+    <div class="section">
+      <p class="login-form-child">
+        Name: {{ form.name(size=120) }}
+      </p>
+    </div>
+    <p>
+    	<input type="submit" name="submit" value="Save">
+    </p>
+  </form>
+  <form action="" method="POST" name="discard">
+    {{ form.hidden_tag() }}
+      <input type="submit" name="submit" value="Discard">
+  </form>
+</div>
+{% endblock %}
