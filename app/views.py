@@ -1,5 +1,5 @@
 import os
-
+from time import gmtime, strftime
 from flask import render_template, redirect, request, session
 from app import app, models, db
 from .forms import *
@@ -74,7 +74,9 @@ def preview():
         filename = session["filename"]
         if request.form['action'] == 'save' and form.validate_on_submit():
             name = form.name.data
-            save_stuff(name, filename, data)
+            dt = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+            user_id = session["user_id"]
+            save_stuff(user_id, name, filename, dt, data)
             return redirect('/upload')
         if request.form['action'] == 'discard':
             return redirect('/upload')
