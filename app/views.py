@@ -33,13 +33,13 @@ def login():
                 password = form.password.data
                 users = check_user(username);
                 if not users:
-                    print 'Username "%s" taken.' % (username)
+                    print('Username "%s" taken.' % (username))
                     return render_template('login.html', form=form, error='username-taken')
                 else:
                     user_id = sign_up(username, password)
                     session['user_id'] = user_id
                     return redirect('/upload')
-            print 'Invalid data.'
+            print('Invalid data.')
             return render_template('login.html', form=form, error='invalid-data')
     elif request.method == 'GET':
         return render_template('login.html', form=form)
