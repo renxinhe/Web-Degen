@@ -50,10 +50,22 @@ def retrieve_saves(user_id):
     with sql.connect("app.db") as conn:
         conn.row_factory = sql.Row
         cur = conn.cursor()
-        result = cur.execute("select 1").fetchall()
+        result =  cur.execute("select entries.id, entries.name, entries.dt from entries WHERE entries.userid = " + str(user_id)).fetchall()
     return result
 
 # TODO
-def save_stuff(name, filename, data):
-    print('Saving %s...' % name)
-    return
+def save_stuff(userid, name, filename, datetime, data):
+    with sql.connect("app.db") as conn:
+        cur = conn.cursor()
+        cur.execute("INSERT INTO entries(name, filename, dt, userid) VALUES (?, ?, ?, ?)", (name, filename, datetime, userid))
+        userid = cur.execute('SELECT last_insert_rowid()').fetchone()[0]
+        conn.commit()
+    return userid
+
+def delete_save(entryid):
+    with sql.connect("app.db") as conn:
+        cur = conn.cursor()
+        cur.execute("PRAGMA foreign_keys = ON")
+        cur.execute("DELETE FROM entries WHERE id =" + str(entryid))
+        conn.commit()
+>>>>>>> fcacb8c466cd30b4fe294f8e49acf8a44d888ec4
