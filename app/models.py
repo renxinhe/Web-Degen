@@ -32,11 +32,13 @@ def load_model():
 def predict(filepath):
     from classes.Utils import Utils
     import numpy as np
+    print(filepath)
     evaluation_img = Utils.get_preprocessed_img(filepath, IMAGE_SIZE)
 
-    beam_width = 1
-    print("Search with beam width: {}".format(beam_width))
-    result, _ = sampler.predict_beam_search(model, np.array([evaluation_img]), beam_width=beam_width)
+    # beam_width = 30
+    # print("Search with beam width: {}".format(beam_width))
+    result, _  = sampler.predict_greedy(model, np.array([evaluation_img]))
+    # result, _ = sampler.predict_beam_search(model, np.array([evaluation_img]), beam_width=beam_width)
     print("Result beam: {}".format(result))
 
     import sys
@@ -121,7 +123,7 @@ def get_img(user_id, entryid):
     with sql.connect("app.db") as conn:
         conn.row_factory = sql.Row
         cur = conn.cursor()
-        result =  cur.execute("select entries.filename from entries WHERE entries.userid = ?", str(user_id)).fetchall()
+        result =  cur.execute("select entries.filename from entries WHERE entries.userid = ? AND entries.id = ?", (str(user_id), entryid)).fetchall()
     return result
 
 # TODO

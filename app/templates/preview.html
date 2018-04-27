@@ -12,13 +12,6 @@ Upload
 <!-- 2. extend content here from base -->
 {% block content %}
 <div class="container">
-  <div class="jumbotron">
-    {% if preview %}
-    <!-- do whatever it takes to show a preview of the gen -->
-    {% else %}
-    Placeholder webpage preview
-    {% endif %}
-  </div>
 
   <form class="form-inline" action="" method="POST" name="preview">
     {{ form.hidden_tag() }}
