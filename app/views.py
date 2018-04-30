@@ -94,13 +94,7 @@ def delete(value):
 
 @app.route('/download/<value>', methods=['GET', 'POST'])
 def download(value):
+    # get image file for design and generate code prediction
     filename = get_img(session["user_id"], value)[0]['filename']
     filepath = os.path.join(app.instance_path, 'photos', filename)
     return predict(filepath)
-
-    # with open("{}/{}.gui".format(output_path, file_name), 'w') as out_f:
-    #     out_f.write(result.replace(START_TOKEN, "").replace(END_TOKEN, ""))
-
-    # download_save(value)
-    # return redirect('/upload')
-    # return get_img(session["user_id"], value)

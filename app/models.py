@@ -1,53 +1,47 @@
 import sqlite3 as sql
 from app import app
 
-
+#import pix2code classes
 from classes.Utils import *
 from classes.Compiler import *
+from classes.model.pix2code import *
 from classes.model.Config import *
 from classes.Vocabulary import * 
+from classes.Sampler import * 
+import sys
+import numpy as np
+
 sampler = None
 model = None
+
+#load pix2code models only once
 @app.before_first_request
 def load_model():
-
-    import sys
-    import numpy as np
-    from os.path import basename
-    from classes.Sampler import Sampler
-    from classes.model.pix2code import pix2code
-    from classes.model.Config import CONTEXT_LENGTH
-    print('loading')
     global sampler, model
+    #load pix2code dataset parameters
     meta_dataset = np.load("/home/andrewliu/berkeley/pix2code/bin/meta_dataset.npy")
     input_shape = meta_dataset[0]
     output_size = meta_dataset[1]
 
+    #load pretrained weights
     trained_weights_path = '/home/andrewliu/berkeley/pix2code/bin'
     model = pix2code(input_shape, output_size, trained_weights_path)
     model.load('pix2code')
 
+    #create sampler for generating code
     sampler = Sampler(trained_weights_path, input_shape, output_size, CONTEXT_LENGTH)
 
 def predict(filepath):
-    from classes.Utils import Utils
-    import numpy as np
-    print(filepath)
+    #process image file
     evaluation_img = Utils.get_preprocessed_img(filepath, IMAGE_SIZE)
 
-    # beam_width = 30
-    # print("Search with beam width: {}".format(beam_width))
+    #run model prediction using greedy sampler
     result, _  = sampler.predict_greedy(model, np.array([evaluation_img]))
-    # result, _ = sampler.predict_beam_search(model, np.array([evaluation_img]), beam_width=beam_width)
-    print("Result beam: {}".format(result))
-
-    import sys
-
-    from os.path import basename
 
     FILL_WITH_RANDOM_TEXT = True
     TEXT_PLACE_HOLDER = "[]"
 
+    #compile DSL into html
     dsl_path = "assets/web-dsl-mapping.json"
     compiler = Compiler(dsl_path)
 
@@ -61,8 +55,9 @@ def predict(filepath):
                 value = value.replace(TEXT_PLACE_HOLDER,
                                       Utils.get_random_text(length_text=56, space_number=7, with_upper_case=False))
         return value
+
+    # clean up generated html
     result = result.replace(START_TOKEN, "").replace(END_TOKEN, "")
-    print(result.strip(' \t\n\r').split("\n"))
     return compiler.compile(result.strip(' \t\n\r').split("\n"), rendering_function=render_content_with_text)
 
 
@@ -119,6 +114,7 @@ def retrieve_saves(user_id):
         result =  cur.execute("select entries.id, entries.name, entries.dt from entries WHERE entries.userid = " + str(user_id)).fetchall()
     return result
 
+# gets entryid for user user_id
 def get_img(user_id, entryid):
     with sql.connect("app.db") as conn:
         conn.row_factory = sql.Row
@@ -126,7 +122,6 @@ def get_img(user_id, entryid):
         result =  cur.execute("select entries.filename from entries WHERE entries.userid = ? AND entries.id = ?", (str(user_id), entryid)).fetchall()
     return result
 
-# TODO
 def save_stuff(userid, name, filename, datetime, data):
     with sql.connect("app.db") as conn:
         cur = conn.cursor()
