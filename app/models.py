@@ -66,7 +66,7 @@ def check_up(username, password):
     with sql.connect("app.db") as conn:
         conn.row_factory = sql.Row
         cur = conn.cursor()
-        result = cur.execute("select users.userid, users.password from users WHERE users.username ='" + username + "'").fetchall()
+        result = cur.execute("select users.userid, users.password from users WHERE users.username = ?", (username,)).fetchall()
     if len(result) == 0 or result[0]["password"] != password:
         return False
     else:
@@ -77,7 +77,7 @@ def check_user(username):
     with sql.connect("app.db") as conn:
         conn.row_factory = sql.Row
         cur = conn.cursor()
-        result = cur.execute("select users.username from users WHERE users.username ='" + username + "'").fetchall()
+        result = cur.execute("select users.username from users WHERE users.username = ?", (username,)).fetchall()
     if len(result) == 0:
         return True
     else:
@@ -97,7 +97,7 @@ def retrieve_saves(user_id):
     with sql.connect("app.db") as conn:
         conn.row_factory = sql.Row
         cur = conn.cursor()
-        result =  cur.execute("select entries.id, entries.name, entries.dt from entries WHERE entries.userid = " + str(user_id)).fetchall()
+        result =  cur.execute("select entries.id, entries.name, entries.dt from entries WHERE entries.userid = ?", (user_id,)).fetchall()
     return result
 
 # Get the filename for a specific user's saved upload
@@ -122,5 +122,5 @@ def delete_save(entryid):
     with sql.connect("app.db") as conn:
         cur = conn.cursor()
         cur.execute("PRAGMA foreign_keys = ON")
-        cur.execute("DELETE FROM entries WHERE id =" + str(entryid))
+        cur.execute("DELETE FROM entries WHERE id = ?", (entryid,))
         conn.commit()
