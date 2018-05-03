@@ -60,24 +60,8 @@ def predict(filepath):
     result = result.replace(START_TOKEN, "").replace(END_TOKEN, "")
     return compiler.compile(result.strip(' \t\n\r').split("\n"), rendering_function=render_content_with_text)
 
-
-def retrieve_users():
-    # SQL statement to query database goes here
-    with sql.connect("app.db") as conn:
-        conn.row_factory = sql.Row
-        cur = conn.cursor()
-        result = cur.execute("select users.userid, users.username from users").fetchall()
-    return result
-
-def retrieve_username():
-    # SQL statement to query database goes here
-    with sql.connect("app.db") as conn:
-        conn.row_factory = sql.Row
-        cur = conn.cursor()
-        result = cur.execute("select users.username from users").fetchall()
-    return result
-
-##You might have additional functions to access the database
+# Check if a username/password pair exists in the database
+# If so, return that user's ID
 def check_up(username, password):
     with sql.connect("app.db") as conn:
         conn.row_factory = sql.Row
@@ -88,6 +72,7 @@ def check_up(username, password):
     else:
         return result[0]["userid"]
 
+# Check if a username does NOT exist in the database, for signup
 def check_user(username):
     with sql.connect("app.db") as conn:
         conn.row_factory = sql.Row
@@ -97,7 +82,8 @@ def check_user(username):
         return True
     else:
         return False
-    
+
+# Inserts a new username/password entry into the database, for signup
 def sign_up(username, password):
     with sql.connect("app.db") as conn:
         cur = conn.cursor()
@@ -106,7 +92,7 @@ def sign_up(username, password):
         conn.commit()
     return userid
 
-# TODO
+# Retrieves the saved history of a user
 def retrieve_saves(user_id):
     with sql.connect("app.db") as conn:
         conn.row_factory = sql.Row
@@ -114,7 +100,7 @@ def retrieve_saves(user_id):
         result =  cur.execute("select entries.id, entries.name, entries.dt from entries WHERE entries.userid = " + str(user_id)).fetchall()
     return result
 
-# gets entryid for user user_id
+# Get the filename for a specific user's saved upload
 def get_img(user_id, entryid):
     with sql.connect("app.db") as conn:
         conn.row_factory = sql.Row
@@ -122,7 +108,8 @@ def get_img(user_id, entryid):
         result =  cur.execute("select entries.filename from entries WHERE entries.userid = ? AND entries.id = ?", (str(user_id), entryid)).fetchall()
     return result
 
-def save_stuff(userid, name, filename, datetime, data):
+# Insert a new entry in a user's history
+def save_stuff(userid, name, filename, datetime):
     with sql.connect("app.db") as conn:
         cur = conn.cursor()
         cur.execute("INSERT INTO entries(name, filename, dt, userid) VALUES (?, ?, ?, ?)", (name, filename, datetime, userid))
@@ -130,6 +117,7 @@ def save_stuff(userid, name, filename, datetime, data):
         conn.commit()
     return userid
 
+# Delete an entry from a user's history
 def delete_save(entryid):
     with sql.connect("app.db") as conn:
         cur = conn.cursor()

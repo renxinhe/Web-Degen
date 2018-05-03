@@ -24,7 +24,6 @@ def login():
                 # Retreive submitted form data
                 username = form.username.data
                 password = form.password.data
-                users = retrieve_username()
 
                 # Check user login info in database
                 user_id = check_up(username, password)
@@ -62,10 +61,10 @@ def logout():
     session.pop('user_id', None)
     return redirect('/login')
 
+# Users upload images from this page
 # https://flask-wtf.readthedocs.io/en/stable/form.html#module-flask_wtf.file
 @app.route('/upload', methods=['POST', 'GET'])
 def upload():
-    # Retreive trips for this user from DB
     form = ImageForm()
     if "user_id" in session:
         user_id = session["user_id"]
@@ -79,32 +78,33 @@ def upload():
         return render_template('upload.html', form=form, saves=saves)
     return redirect("/login")
 
+# After a user uploads an image, they specify the name they would like to
+# save it as, and this page will save it to the database
 @app.route('/preview', methods=['POST', 'GET'])
 def preview():
     form = SaveForm()
-    data = get_preview()
     if request.method == 'POST':
         filename = session["filename"]
+        # Save the uploaded design
         if request.form['action'] == 'save' and form.validate_on_submit():
             name = form.name.data
             dt = strftime("%Y-%m-%d %H:%M:%S", gmtime())
             user_id = session["user_id"]
-            save_stuff(user_id, name, filename, dt, data)
+            save_stuff(user_id, name, filename, dt)
             return redirect('/upload')
+        # Alternatively, users can discard their upload
         if request.form['action'] == 'discard':
             return redirect('/upload')
         return 'Action should be either "save" or "discard".'
-    return render_template('preview.html', form=form, preview=data)
+    return render_template('preview.html', form=form)
 
-# TODO: get HTML preview or whatever is generated from image
-def get_preview():
-    return
-
+# Delete an entry from a user's history
 @app.route('/delete/<value>', methods=['GET', 'POST'])
 def delete(value):
     delete_save(value)
     return redirect('/upload')
 
+# Generate and download a generated HTML document
 @app.route('/download/<value>', methods=['GET', 'POST'])
 def download(value):
     # get image file for design and generate code prediction
