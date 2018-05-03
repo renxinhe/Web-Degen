@@ -17,20 +17,30 @@ def login():
     form = LoginForm()
     if request.method == 'POST':
         action = request.form['action']
+
+        # User pressed "Login" button
         if action == 'login':
             if form.validate_on_submit():
+                # Retreive submitted form data
                 username = form.username.data
                 password = form.password.data
                 users = retrieve_username()
+
+                # Check user login info in database
                 user_id = check_up(username, password)
                 if user_id:
                     session['user_id'] = user_id
                     return redirect('/upload')
             return render_template('login.html', form=form)
+
+        # User pressed "Sign up" button
         elif action == 'signup':
             if form.validate_on_submit():
+                # Retreive submitted form data
                 username = form.username.data
                 password = form.password.data
+
+                # Make sure username not taken
                 users = check_user(username);
                 if not users:
                     print('Username "%s" taken.' % (username))
@@ -39,6 +49,8 @@ def login():
                     user_id = sign_up(username, password)
                     session['user_id'] = user_id
                     return redirect('/upload')
+
+            # Invalid data in form POST request
             print('Invalid data.')
             return render_template('login.html', form=form, error='invalid-data')
     elif request.method == 'GET':
@@ -46,6 +58,7 @@ def login():
 
 @app.route('/logout')
 def logout():
+    # Remove user from session
     session.pop('user_id', None)
     return redirect('/login')
 

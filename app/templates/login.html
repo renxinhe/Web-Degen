@@ -6,29 +6,40 @@
 {% block content %}
 <form class="form-signin" action="" method="post" name="login">
   <img src="http://static.tumblr.com/84dbb532800492a610bea9ff12ed3c13/be2ezm8/iQxmo1cgb/tumblr_static_degenlogo.png"/>
+
+  <!-- CSRF Token -->
   {{ form.hidden_tag() }}
+
+        <!-- Username Form Group -->
         <div class="form-group">
           <label for="username">Username</label>
           <input class="form-control {% if error is defined %}is-invalid{% endif %}" id="username" name="username" placeholder="Username">
           {% if error == 'username-taken' %}
+          <!-- Error message if username is taken -->
           <div class="invalid-feedback">
             Username has been taken.
           </div>
           {% elif error == 'invalid-data' %}
+          <!-- Error message if username contains invalid characters -->
           <div class="invalid-feedback">
             Invalid username.
           </div>
           {% endif %}
         </div>
+
+        <!-- Password Form Group -->
         <div class="form-group">
           <label for="password">Password</label>
           <input type="password" class="form-control {% if error == 'invalid-data' %}is-invalid{% endif %}" id="password" name="password" placeholder="Password">
           {% if error == 'invalid-data' %}
+          <!-- Error message if password contains invalid characters -->
           <div class="invalid-feedback">
             Invalid password.
           </div>
           {% endif %}
         </div>
+
+        <!-- Login and Sign up Buttons -->
         <div class="row">
           <div class="col-md-3">
             <button type="submit" class="btn btn-primary" name="action" value="login">Login</button>
