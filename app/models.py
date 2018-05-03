@@ -15,7 +15,7 @@ sampler = None
 model = None
 
 #load pix2code models only once
-@app.before_first_request
+# @app.before_first_request
 def load_model():
     global sampler, model
     #load pix2code dataset parameters
